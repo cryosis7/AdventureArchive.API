@@ -1,6 +1,4 @@
 using AdventureArchive.Api.Constants;
-using AdventureArchive.Api.Models;
-using AdventureArchive.Api.Models.Response;
 using AdventureArchive.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +6,7 @@ namespace AdventureArchive.Api.Controllers;
 
 [ApiController]
 [Route("api/doc")]
-public class DocController(DocService docService) : ControllerBase
+public class DocController(IDocService docService) : ControllerBase
 {
     /// <summary>
     /// Gets tracks for a region from the DOC api

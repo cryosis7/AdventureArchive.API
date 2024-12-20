@@ -6,7 +6,7 @@ using AdventureArchive.Api.Models.Response;
 
 namespace AdventureArchive.Api.Services;
 
-public class DocService
+public class DocService : IDocService
 {
     private readonly HttpClient _httpClient;
     private readonly string _tracksEndpoint;
@@ -69,7 +69,7 @@ public class DocService
 
             var validationErrors = new List<ValidationResult>();
             var allErrors = new List<string>();
-
+            var validHuts = new List<DocHutModel>();
             foreach (var hut in huts)
             {
                 var validationContext = new ValidationContext(hut);
@@ -80,11 +80,15 @@ public class DocService
                     allErrors.AddRange(validationErrors.Select(validationResult =>
                         $"Validation error for hut {hut.Name} (ID: {hut.AssetId}): {validationResult.ErrorMessage}"));
                 }
+                else
+                {
+                    validHuts.Add(hut);
+                }
             }
 
             return new DocHutsResponse
             {
-                Huts = huts,
+                Huts = validHuts,
                 IsValid = allErrors.Count == 0,
                 ValidationErrors = allErrors
             };

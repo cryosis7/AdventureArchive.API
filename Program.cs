@@ -11,8 +11,7 @@ builder.Services.AddSwaggerGen(c => c.IncludeXmlComments(xmlPath));
 
 builder.Services.AddControllers();
 
-var proxyAddress = builder.Configuration.GetSection("ProxySettings")["Address"];
-builder.Services.AddHttpClient<DocService>("DocService")
+builder.Services.AddHttpClient<IDocService, DocService>("DocService")
     .ConfigurePrimaryHttpMessageHandler(() =>
     {
         var httpProxy = Environment.GetEnvironmentVariable("HTTP_PROXY");
@@ -27,34 +26,6 @@ builder.Services.AddHttpClient<DocService>("DocService")
 
         return new HttpClientHandler();
     });
-// builder.Services.AddHttpClient<DocService>("DocService")
-//     .ConfigurePrimaryHttpMessageHandler(() =>
-//     {
-//         var proxy = proxyAddress != null
-//             ? new WebProxy
-//             {
-//                 Address = new Uri(proxyAddress),
-//                 BypassProxyOnLocal = false
-//             }
-//             : null;
-//
-//         if (builder.Environment.IsDevelopment())
-//         {
-//             return new HttpClientHandler
-//             {
-//                 Proxy = proxy,
-//                 UseProxy = true,
-//                 ServerCertificateCustomValidationCallback =
-//                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-//             };
-//         }
-//
-//         return new HttpClientHandler
-//         {
-//             Proxy = proxy,
-//             UseProxy = proxy != null
-//         };
-//     });
 
 var app = builder.Build();
 
@@ -66,10 +37,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-
-// app.UseCors(policy =>
-//     policy.SetIsOriginAllowed((origin) => origin)
-//         .AllowAnyMethod()
-//         .AllowAnyHeader());
 
 app.Run();
