@@ -1,6 +1,10 @@
 using AdventureArchive.Api.Constants;
+using AdventureArchive.Api.Models.Hut;
+using AdventureArchive.Api.Models.Track;
 using AdventureArchive.Api.Services;
+using AdventureArchive.Api.Services.Doc;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace AdventureArchive.Api.Controllers;
 
@@ -39,20 +43,29 @@ public class DocController(IDocService docService) : ControllerBase
     /// - DOC-FIL: Fiordland
     /// </remarks>
     [HttpGet("tracks")]
-    public async Task<IActionResult> GetTracks([FromQuery] string? regionCode)
+    public async Task<ActionResult<TracksContract>> GetTracks([FromQuery] string? regionCode)
     {
         try
         {
             if (regionCode != null && !Regions.ValidRegionCodes.Contains(regionCode))
             {
+                Log.Information("Invalid region code {RegionCode} provided", regionCode);
                 return BadRequest("Invalid region code.");
             }
             var tracksData = await docService.GetTracksAsync(regionCode);
-            return Ok(tracksData);
+            return Ok(tracksData.ToContract());
         }
         catch (HttpRequestException ex)
         {
-            return StatusCode(500, new { message = "Error calling DOC API.", details = ex.Message });
+            if (string.IsNullOrEmpty(regionCode))
+            {
+                Log.Information(ex, "Error in Doc Service while getting all tracks");
+            }
+            else
+            {
+                Log.Information(ex, "Error in Doc Service while getting tracks with region code {RegionCode}", regionCode);
+            }
+            return StatusCode(500, new { message = "There was an error getting your response", details = ex.Message });
         }
     }
     
@@ -64,15 +77,17 @@ public class DocController(IDocService docService) : ControllerBase
     /// 500 Internal Server Error if there is an error calling the DOC API.
     /// </returns>
     [HttpGet("huts")]
-    public async Task<IActionResult> GetHuts()
+    public async Task<ActionResult<HutsContract>> GetHuts()
     {
         try
         {
-            return Ok(await docService.GetHutsAsync());
+            var hutsData = await docService.GetHutsAsync();
+            return Ok(hutsData.ToContract());
         }
         catch (HttpRequestException ex)
         {
-            return StatusCode(500, new { message = "Error calling DOC API.", details = ex.Message });
+            Log.Information(ex, "Error in Doc Service while getting huts");
+            return StatusCode(500, new { message = "There was an error getting your response", details = ex.Message });
         }
     }
 }

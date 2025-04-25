@@ -1,17 +1,17 @@
-using NUnit.Framework;
-using FluentAssertions;
 using System.ComponentModel.DataAnnotations;
 using AdventureArchive.Api.Constants;
+using FluentAssertions;
+using NUnit.Framework;
 
-namespace AdventureArchive.Api.Models;
+namespace AdventureArchive.Api.Models.Hut;
 
 [TestFixture]
-public class DocHutModelTests
+public class HutModelTests
 {
     [Test]
     public void ValidData_ShouldPassValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "Test Hut",
@@ -31,7 +31,7 @@ public class DocHutModelTests
     [Test]
     public void MissingRegion_ShouldPassValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "Test Hut",
@@ -50,7 +50,7 @@ public class DocHutModelTests
     [Test]
     public void InvalidAssetId_ShouldFailValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 0,
             Name = "Test Hut",
@@ -71,7 +71,7 @@ public class DocHutModelTests
     [Test]
     public void MissingAssetId_ShouldFailValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             Name = "Test Hut",
             Status = "OPEN",
@@ -90,7 +90,7 @@ public class DocHutModelTests
     [Test]
     public void EmptyName_ShouldFailValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "",
@@ -111,7 +111,7 @@ public class DocHutModelTests
     [Test]
     public void NameExceedsMaxLength_ShouldFailValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = new string('A', 256),
@@ -132,7 +132,7 @@ public class DocHutModelTests
     [Test]
     public void InvalidStatus_ShouldFailValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "Test Hut",
@@ -153,7 +153,7 @@ public class DocHutModelTests
     [Test]
     public void InvalidRegion_ShouldFailValidation()
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "Test Hut",
@@ -175,7 +175,7 @@ public class DocHutModelTests
     [TestCase(91)]
     public void InvalidLatitude_ShouldFailValidation(double lat)
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "Test Hut",
@@ -197,7 +197,7 @@ public class DocHutModelTests
     [TestCase(181)]
     public void InvalidLongitude_ShouldFailValidation(double lon)
     {
-        var model = new DocHutModel
+        var model = new HutModel
         {
             AssetId = 1,
             Name = "Test Hut",

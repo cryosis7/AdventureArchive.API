@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using AdventureArchive.Api.Attributes.Validation;
-using AdventureArchive.Api.Constants;
 
-namespace AdventureArchive.Api.Models;
+namespace AdventureArchive.Api.Models.Hut;
 
-public class DocHutModel
+public class HutModel
 {
     [Required]
     [Range(1, long.MaxValue, ErrorMessage = "Asset ID must be a positive number")]
@@ -12,11 +11,11 @@ public class DocHutModel
 
     [Required]
     [StringLength(255)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [Required]
     [RegularExpression("^(OPEN|CLSD)$", ErrorMessage = "Status must be either OPEN or CLSD")]
-    public string Status { get; set; }
+    public required string Status { get; set; }
 
     [RegionCode]
     public string? Region { get; set; }
