@@ -4,12 +4,7 @@ public static class HutExtensions
 {
     public static HutsContract ToContract(this List<HutModel> models)
     {
-        return new HutsContract
-        {
-            Huts = models.Select(m => m.ToContract()).ToList(),
-            IsValid = true,
-            ValidationErrors = new List<string>()
-        };
+        return new HutsContract { Huts = models.Select(m => m.ToContract()).ToList() };
     }
 
     public static HutContract ToContract(this HutModel model)

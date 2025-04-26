@@ -3,8 +3,6 @@ namespace AdventureArchive.Api.Models.Track;
 public class TracksContract
 {
     public required List<TrackContract> Tracks { get; set; }
-    public bool IsValid { get; set; }
-    public required List<string> ValidationErrors { get; set; }
 }
 
 public class TrackContract

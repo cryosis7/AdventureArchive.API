@@ -19,9 +19,7 @@ public static class TrackModelExtensions
     {
         return new TracksContract
         {
-            Tracks = models.Select(m => m.ToContract()).ToList(),
-            IsValid = true,
-            ValidationErrors = []
+            Tracks = models.Select(m => m.ToContract()).ToList()
         };
     }
 }

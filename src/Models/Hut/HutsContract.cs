@@ -3,8 +3,6 @@ namespace AdventureArchive.Api.Models.Hut;
 public class HutsContract
 {
     public required List<HutContract> Huts { get; set; }
-    public bool IsValid { get; set; }
-    public required List<string> ValidationErrors { get; set; }
 }
 
 public class HutContract

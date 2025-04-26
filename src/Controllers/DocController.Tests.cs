@@ -23,31 +23,48 @@ public class DocControllerTests
         _controller = new DocController(_mockDocService.Object);
     }
 
-    [TestCase("NZ-NTL")]
-    [TestCase(null)]
-    public async Task GetTracks_ValidRegionCode_ReturnsOk(string regionCode)
+    [Test]
+    public async Task GetTracks_NoRegionCode_ReturnsOk()
     {
-        List<TrackModel> response = [new() { Name = "Track 1", Line = [] }];
+        var trackModel = new TrackModel() { Name = "Track 1", Line = [] };
         _mockDocService
-            .Setup(service => service.GetTracksAsync(regionCode))
-            .ReturnsAsync(response);
+            .Setup(service => service.GetTracksAsync(null))
+            .ReturnsAsync([trackModel]);
 
-        var result = await _controller.GetTracks(regionCode);
-
-        result.Should().NotBeNull();
-        result.Result.Should().Be(200);
-        result.Value.Should().BeEquivalentTo(response);
+        var result = await _controller.GetTracks(null);
+        
+        result.Result.Should().BeOfType<OkObjectResult>().Which.StatusCode.Should().Be(200);
+        result.Result.As<OkObjectResult>().Value.Should().BeEquivalentTo(new TracksContract
+        {
+            Tracks = [trackModel.ToContract()]
+        });
     }
 
-    [TestCase("")]
-    [TestCase("INVALID")]
-    public async Task GetTracks_InvalidRegionCode_ReturnsBadRequest(string regionCode)
+    [Test]
+    public async Task GetTracks_ValidRegionCode_ReturnsOk()
     {
-        var result = await _controller.GetTracks(regionCode);
+        var trackModel = new TrackModel() { Name = "Track 1", Line = [] };
+        _mockDocService
+            .Setup(service => service.GetTracksAsync("NZ-NTL"))
+            .ReturnsAsync([trackModel]);
 
-        result.Should().NotBeNull();
-        result.Result.Should().Be(400);
-        result.Value.Should().Be("Invalid region code.");
+        var result = await _controller.GetTracks("NZ-NTL");
+        
+        result.Result.Should().BeOfType<OkObjectResult>().Which.StatusCode.Should().Be(200);
+        result.Result.As<OkObjectResult>().Value.Should().BeEquivalentTo(new TracksContract
+        {
+            Tracks = [trackModel.ToContract()]
+        });
+    }
+
+    [Test]
+    public async Task GetTracks_InvalidRegionCode_ReturnsBadRequest()
+    {
+        var result = await _controller.GetTracks("INVALID");
+
+        result.Result.Should().BeOfType<BadRequestObjectResult>().Which
+            .StatusCode.Should().Be(400);
+        result.Result.As<ObjectResult>().Value.Should().Be("Invalid region code.");
     }
 
     [Test]
@@ -60,32 +77,34 @@ public class DocControllerTests
 
         var result = await _controller.GetTracks(regionCode);
 
-        result.Should().NotBeNull();
-        result.Result.Should().Be(500);
+        result.Result.Should().BeOfType<ObjectResult>().Which
+            .StatusCode.Should().Be(500);
         // result.Value.Should().Be("Error calling DOC API.");
         // ((dynamic)result.Value).message.Should().Be("Error calling DOC API.");
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public async Task GetHuts_ReturnsOk(bool validResponse)
+    [Test]
+    public async Task GetHuts_ReturnsOk()
     {
-        string[] validationErrors = validResponse ? [] : ["Invalid data"];
-        var hutsResponse = new HutsContract
+        var hut = new HutModel
         {
-            IsValid = validResponse,
-            ValidationErrors = validationErrors.ToList(),
-            Huts = []
+            Name = "Hut 1",
+            AssetId = 12345,
+            Status = "OPEN",
+            Region = "NZ-NTL"
         };
+
         _mockDocService
             .Setup(service => service.GetHutsAsync())
-            .ReturnsAsync([]);
+            .ReturnsAsync([hut]);
 
         var result = await _controller.GetHuts();
 
-        result.Should().NotBeNull();
-        result.Result.Should().Be(200);
-        result.Value.Should().BeEquivalentTo(hutsResponse);
+        result.Result.Should().BeOfType<OkObjectResult>().Which.StatusCode.Should().Be(200);
+        result.Result.As<OkObjectResult>().Value.Should().BeEquivalentTo(new HutsContract
+        {
+            Huts = [hut.ToContract()]
+        });
     }
 
     [Test]
@@ -97,8 +116,7 @@ public class DocControllerTests
 
         var result = await _controller.GetHuts();
 
-        result.Should().NotBeNull();
-        result.Result.Should().Be(500);
-        // result.Value.Should().Be("Error calling DOC API.");
+        result.Result.Should().BeOfType<ObjectResult>().Which
+            .StatusCode.Should().Be(500);
     }
 }
