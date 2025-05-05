@@ -6,21 +6,19 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "hotReloadEnabled": true,
       "applicationUrl": "http://localhost:5130",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "dev-withProxy": {
+    "prod": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchBrowser": false,
+      "hotReloadEnabled": true,
       "applicationUrl": "http://localhost:5130",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "HTTP_PROXY": "http://localhost:8500",
-        "HTTPS_PROXY": "http://localhost:8500"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     }
   }

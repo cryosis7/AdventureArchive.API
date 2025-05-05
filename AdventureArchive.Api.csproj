@@ -31,6 +31,11 @@
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\Application\Interfaces\" />
+    <Folder Include="src\Application\Services\" />
+    <Folder Include="src\Domain\DomainServices\" />
+  </ItemGroup>
   
   <Target Name="GenerateOpenApiSpec" AfterTargets="Build">
     <Exec Command="dotnet tool run swagger tofile --output $(OutputPath)swagger.json $(TargetPath) v1" />
