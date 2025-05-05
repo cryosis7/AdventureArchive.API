@@ -1,4 +1,4 @@
-using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
+using AdventureArchive.Api.Domain.Entities;
 
 namespace AdventureArchive.Api.Api.Models.Doc.Tracks;
 
@@ -11,7 +11,7 @@ public class GetTracksResponse
         Tracks = [];
     }
 
-    public GetTracksResponse(IEnumerable<TrackModel> tracks)
+    public GetTracksResponse(IEnumerable<Track> tracks)
     {
         Tracks = tracks.Select(track => track.ToContract()).ToList();
     }

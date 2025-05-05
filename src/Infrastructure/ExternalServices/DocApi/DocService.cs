@@ -7,7 +7,7 @@ public class DocService(IDocHttpClient docHttpClient) : IDocService
 {
     private readonly IDocHttpClient _docHttpClient = docHttpClient ?? throw new ArgumentNullException(nameof(docHttpClient));
 
-    public async Task<IEnumerable<TrackModel>> GetTracksAsync(string? regionCode)
+    public async Task<IEnumerable<TrackDto>> GetTracksAsync(string? regionCode)
     {
         if (string.IsNullOrEmpty(regionCode))
         {

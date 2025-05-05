@@ -16,6 +16,6 @@ public class HutWaypoint : BaseWaypoint
         Id = hutDto.AssetId.ToString();
         Name = hutDto.Name;
         Location = Location.CreateLocation(hutDto.Lat, hutDto.Lon);
-        Region = Enum.TryParse<Region>(hutDto.Region, out var region) ? region : null;
+        Region = Enum.TryParse<RegionEnum>(hutDto.Region, out var region) ? region : null;
     }
 }

@@ -25,6 +25,7 @@ public static class ServiceExtensions
             });
         services.AddScoped<IDocService, DocService>();
         services.AddScoped<IHutProvider, HutRepository>();
+        services.AddScoped<ITrackProvider, TrackRepository>();
         
     }
 }

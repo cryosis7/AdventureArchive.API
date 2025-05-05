@@ -19,5 +19,5 @@ public interface IWaypoint
     
     public Location Location { get; set; }
     
-    public Region? Region { get; set; }
+    public RegionEnum? Region { get; set; }
 }

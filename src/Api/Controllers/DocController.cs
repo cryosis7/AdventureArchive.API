@@ -1,7 +1,7 @@
 using AdventureArchive.Api.Api.Models.Doc.Huts;
 using AdventureArchive.Api.Api.Models.Doc.Tracks;
-using AdventureArchive.Api.Constants;
-using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
+using AdventureArchive.Api.Domain.Enums;
+using AdventureArchive.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -9,7 +9,7 @@ namespace AdventureArchive.Api.Api.Controllers;
 
 [ApiController]
 [Route("api/doc")]
-public class DocController(IDocService docService) : ControllerBase
+public class DocController(IHutProvider hutProvider, ITrackProvider trackProvider) : ControllerBase
 {
     /// <summary>
     /// Gets tracks for a region from the DOC api
@@ -47,13 +47,13 @@ public class DocController(IDocService docService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GetTracksResponse>> GetTracks([FromQuery] string? regionCode)
     {
-        if (regionCode != null && !Regions.ValidRegionCodes.Contains(regionCode))
+        if (regionCode != null && regionCode.ToRegionEnum() == null)
         {
             Log.Information("Invalid region code {RegionCode} provided", regionCode);
             return BadRequest("Invalid region code.");
         }
 
-        var tracksData = await docService.GetTracksAsync(regionCode);
+        var tracksData = await trackProvider.GetAllAsync(regionCode.ToRegionEnum());
         return Ok(new GetTracksResponse(tracksData));
     }
 
@@ -66,10 +66,17 @@ public class DocController(IDocService docService) : ControllerBase
     /// </returns>
     [HttpGet("huts")]
     [ProducesResponseType(typeof(GetHutsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<GetHutsResponse>> GetHuts()
+    public async Task<ActionResult<GetHutsResponse>> GetHuts([FromQuery] string? regionCode)
     {
-        var hutsData = await docService.GetHutsAsync();
+        if (regionCode != null && regionCode.ToRegionEnum() == null)
+        {
+            Log.Information("Invalid region code {RegionCode} provided", regionCode);
+            return BadRequest("Invalid region code.");
+        }
+        
+        var hutsData = await hutProvider.GetAllAsync(regionCode.ToRegionEnum());
         return Ok(new GetHutsResponse(hutsData));
     }
 }

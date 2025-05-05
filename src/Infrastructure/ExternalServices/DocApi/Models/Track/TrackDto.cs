@@ -1,6 +1,9 @@
-namespace AdventureArchive.Api.Api.Models.Doc.Tracks;
+using System.ComponentModel.DataAnnotations;
+using AdventureArchive.Api.Api.Models.Doc.Tracks;
 
-public class TrackContract
+namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
+
+public class TrackDto
 {
     public Guid AssetId { get; set; }
     public required string Name { get; set; }

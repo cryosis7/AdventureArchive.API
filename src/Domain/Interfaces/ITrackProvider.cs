@@ -3,7 +3,7 @@ using AdventureArchive.Api.Domain.Enums;
 
 namespace AdventureArchive.Api.Domain.Interfaces;
 
-public interface IHutProvider
+public interface ITrackProvider
 {
-    public Task<IEnumerable<Hut>> GetAllAsync(RegionEnum? regionCode);
+    public Task<IEnumerable<Track>> GetAllAsync(RegionEnum? regionCode);
 }

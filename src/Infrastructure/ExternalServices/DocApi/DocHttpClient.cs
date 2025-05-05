@@ -9,8 +9,8 @@ namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 
 public interface IDocHttpClient
 {
-    Task<List<TrackModel>> GetAllTracksAsync();
-    Task<List<TrackModel>> GetTracksByRegionAsync(string regionCode);
+    Task<List<TrackDto>> GetAllTracksAsync();
+    Task<List<TrackDto>> GetTracksByRegionAsync(string regionCode);
     Task<List<HutDto>> GetHutsAsync();
     
     Task<List<HutDto>> GetHutsByRegionAsync(string regionCode);
@@ -41,7 +41,7 @@ public class DocHttpClient : IDocHttpClient
         _httpClient.DefaultRequestHeaders.Add("x-api-key", _docApiOptions.ApiKey);
     }
 
-    public async Task<List<TrackModel>> GetAllTracksAsync()
+    public async Task<List<TrackDto>> GetAllTracksAsync()
     {
         var requestUrl = BuildRequestUrl(_docApiOptions.Endpoints.Tracks);
 
@@ -49,11 +49,11 @@ public class DocHttpClient : IDocHttpClient
         response.EnsureSuccessStatusCode();
         
         var jsonString = await response.Content.ReadAsStringAsync();
-        var tracks = JsonSerializer.Deserialize<List<TrackModel>>(jsonString, _jsonSerialisationOptions);
+        var tracks = JsonSerializer.Deserialize<List<TrackDto>>(jsonString, _jsonSerialisationOptions);
         return tracks ?? [];
     }
 
-    public async Task<List<TrackModel>> GetTracksByRegionAsync(string regionCode) // TODO: Change to enum
+    public async Task<List<TrackDto>> GetTracksByRegionAsync(string regionCode) // TODO: Change to enum
     {
         var requestUrl = BuildRequestUrl(_docApiOptions.Endpoints.Tracks, new Dictionary<string, string>
         {
@@ -64,7 +64,7 @@ public class DocHttpClient : IDocHttpClient
         response.EnsureSuccessStatusCode();
         
         var jsonString = await response.Content.ReadAsStringAsync();
-        var tracks = JsonSerializer.Deserialize<List<TrackModel>>(jsonString, _jsonSerialisationOptions);
+        var tracks = JsonSerializer.Deserialize<List<TrackDto>>(jsonString, _jsonSerialisationOptions);
         return tracks ?? [];
     }
 

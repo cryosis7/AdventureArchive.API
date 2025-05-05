@@ -30,6 +30,8 @@ try
     
     builder.Services.RegisterDependencies(isDevelopment: builder.Environment.IsDevelopment());
 
+    builder.Services.AddMemoryCache();
+
     var app = builder.Build();
     app.UseSerilogRequestLogging();
 

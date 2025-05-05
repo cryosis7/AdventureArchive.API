@@ -6,11 +6,11 @@ public class Location : ValueObject
 {
     [Required]
     [Range(-90, 90, ErrorMessage = "Latitude must be between -90 and 90")]
-    public double Lat { get; set; }
+    public double Lat { get; private init; }
 
     [Required]
     [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180")]
-    public double Lon { get; set; }
+    public double Lon { get; private init; }
 
     protected override IEnumerable<object> GetAtomicValues()
     {

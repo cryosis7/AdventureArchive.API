@@ -15,7 +15,7 @@ public abstract class BaseWaypoint : IWaypoint
     public required IVisitType VisitType { get; set; }
     public required DateRange VisitDuration { get; set; }
     public required Location Location { get; set; }
-    public Region? Region { get; set; }
+    public RegionEnum? Region { get; set; }
 
     protected BaseWaypoint(
         IVisitType visitType,

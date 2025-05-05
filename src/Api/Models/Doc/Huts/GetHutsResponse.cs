@@ -1,4 +1,5 @@
-using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Hut;
+
+using AdventureArchive.Api.Domain.Entities;
 
 namespace AdventureArchive.Api.Api.Models.Doc.Huts;
 
@@ -11,7 +12,7 @@ public class GetHutsResponse
         Huts = [];
     }
     
-    public GetHutsResponse(IEnumerable<HutDto> huts)
+    public GetHutsResponse(IEnumerable<Hut> huts)
     {
         Huts = huts.Select(hut => hut.ToContract()).ToList();
     }
