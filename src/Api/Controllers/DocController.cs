@@ -1,5 +1,6 @@
+using AdventureArchive.Api.Api.Models.Doc;
 using AdventureArchive.Api.Api.Models.Doc.Huts;
-using AdventureArchive.Api.Api.Models.Doc.Tracks;
+using AdventureArchive.Api.Domain.Entities.Landmark;
 using AdventureArchive.Api.Domain.Enums;
 using AdventureArchive.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace AdventureArchive.Api.Api.Controllers;
 
 [ApiController]
 [Route("api/doc")]
-public class DocController(IDocLandmarkRepository docLandmarkRepository) : ControllerBase
+public class DocController(IHutRepository hutRepository, ICampsiteRepository campsiteRepository) : ControllerBase
 {
     /// <summary>
     /// Gets tracks for a region from the DOC api
@@ -56,21 +57,42 @@ public class DocController(IDocLandmarkRepository docLandmarkRepository) : Contr
     //     var tracksData = await trackProvider.GetAllAsync(regionCode.ToRegionEnum());
     //     return Ok(new GetTracksResponse(tracksData));
     // }
-
-
     [HttpGet("huts")]
     [ProducesResponseType(typeof(GetHutsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GetHutsResponse>> GetHuts([FromQuery] string? regionCode)
     {
-        if (regionCode != null && regionCode.ToRegionEnum() == null)
+        var regionEnum = regionCode?.ToRegionEnum();
+        if (regionCode != null && regionEnum == null)
         {
             Log.Information("Invalid region code {RegionCode} provided", regionCode);
             return BadRequest("Invalid region code.");
         }
-        
-        var hutsData = await docLandmarkRepository.GetAllAsync(regionCode.ToRegionEnum());
-        return Ok(new GetHutsResponse(hutsData));
+
+        var hutsData = regionEnum == null
+            ? await hutRepository.GetAllAsync()
+            : await hutRepository.GetByRegion(regionEnum.Value);
+        return Ok(new GetHutsResponse(hutsData.Cast<HutLandmark>()));
+    }
+    
+    [HttpGet]
+    [Route("campsites")]
+    [ProducesResponseType(typeof(GetCampsitesResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<GetCampsitesResponse>> GetCampsites([FromQuery] string? regionCode)
+    {
+        var regionEnum = regionCode?.ToRegionEnum();
+        if (regionCode != null && regionEnum == null)
+        {
+            Log.Information("Invalid region code {RegionCode} provided", regionCode);
+            return BadRequest("Invalid region code.");
+        }
+
+        var campsitesData = regionEnum == null
+            ? await campsiteRepository.GetAllAsync()
+            : await campsiteRepository.GetByRegion(regionEnum.Value);
+        return Ok(new GetCampsitesResponse(campsitesData.Cast<CampsiteLandmark>()));
     }
 }

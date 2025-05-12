@@ -3,7 +3,7 @@ using AdventureArchive.Api.Domain.ValueObjects;
 
 namespace AdventureArchive.Api.Domain.Entities.Landmark;
 
-public class CampsiteLandmark : IDocLandmark
+public class CampsiteLandmark : ILandmark
 {
     public Guid Id { get; }
     public string DocId { get; }
@@ -11,7 +11,7 @@ public class CampsiteLandmark : IDocLandmark
     public string? Description { get; }
     public Location Location { get; }
 
-    public DocLandmarkType LandmarkType => DocLandmarkType.Campsite;
+    public LandmarkType LandmarkType => LandmarkType.Campsite;
 
     internal CampsiteLandmark(string docId, string name, Location location, string? description = null)
     {

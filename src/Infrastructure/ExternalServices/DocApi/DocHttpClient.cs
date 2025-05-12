@@ -107,7 +107,7 @@ public class DocHttpClient : IDocHttpClient
         response.EnsureSuccessStatusCode();
 
         var jsonString = await response.Content.ReadAsStringAsync();
-        var campsites = JsonSerializer.Deserialize<List<HutDto>>(jsonString, _jsonSerialisationOptions);
+        var campsites = JsonSerializer.Deserialize<List<CampsiteDto>>(jsonString, _jsonSerialisationOptions);
 
         return campsites ?? [];
     }
@@ -123,7 +123,7 @@ public class DocHttpClient : IDocHttpClient
         response.EnsureSuccessStatusCode();
 
         var jsonString = await response.Content.ReadAsStringAsync();
-        var huts = JsonSerializer.Deserialize<List<HutDto>>(jsonString, _jsonSerialisationOptions);
+        var huts = JsonSerializer.Deserialize<List<CampsiteDto>>(jsonString, _jsonSerialisationOptions);
 
         return huts ?? [];
     }

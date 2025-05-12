@@ -1,11 +1,9 @@
 using AdventureArchive.Api.Domain.Entities.Landmark;
-using AdventureArchive.Api.Domain.Entities.VisitTime;
-using AdventureArchive.Api.Domain.Extensions;
 using AdventureArchive.Api.Domain.ValueObjects;
 
 namespace AdventureArchive.Api.Domain.Entities.Visit;
 
-public interface IVisit : IValidatableEntity
+public interface IVisit
 {
     ILandmark Landmark { get; }
     

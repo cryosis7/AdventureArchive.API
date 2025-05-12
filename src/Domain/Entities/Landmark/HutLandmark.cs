@@ -3,7 +3,7 @@ using AdventureArchive.Api.Domain.ValueObjects;
 
 namespace AdventureArchive.Api.Domain.Entities.Landmark;
 
-public class HutLandmark : IDocLandmark
+public class HutLandmark : ILandmark
 {
     public Guid Id { get; }
     public string DocId { get; }
@@ -11,7 +11,7 @@ public class HutLandmark : IDocLandmark
     public string? Description { get; }
     public Location Location { get; }
 
-    public DocLandmarkType LandmarkType => DocLandmarkType.Hut;
+    public LandmarkType LandmarkType => LandmarkType.Hut;
 
     internal HutLandmark(string docId, string name, Location location, string? description = null)
     {

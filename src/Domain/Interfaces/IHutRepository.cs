@@ -3,7 +3,7 @@ using AdventureArchive.Api.Domain.Enums;
 
 namespace AdventureArchive.Api.Domain.Interfaces;
 
-public interface IDocLandmarkRepository : ILandmarkRepository
+public interface IHutRepository : ILandmarkRepository
 {
-    Task<IEnumerable<IDocLandmark>> GetByRegion(RegionEnum region);
+    Task<IEnumerable<ILandmark>> GetByRegion(RegionEnum region);
 }

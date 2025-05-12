@@ -1,5 +1,6 @@
 using AdventureArchive.Api.Domain.Entities.Landmark;
 using AdventureArchive.Api.Domain.Enums;
+using AdventureArchive.Api.Domain.Factories;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 using Serilog;
@@ -7,14 +8,15 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace AdventureArchive.Api.Infrastructure.Repositories;
 
-public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory) : ICampsiteRepository
+public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory)
+    : ICampsiteRepository
 {
     private readonly IDocService _docService = docService ?? throw new ArgumentNullException(nameof(docService));
     private readonly IMemoryCache _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(7);
     private const string CacheKeyPrefix = "Campsites";
 
-    public async Task<IEnumerable<IDocLandmark>> GetByRegion(RegionEnum regionCode)
+    public async Task<IEnumerable<ILandmark>> GetByRegion(RegionEnum regionCode)
     {
         return await GetCampsitesInternalAsync(regionCode);
     }
@@ -24,10 +26,10 @@ public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILan
         return await GetCampsitesInternalAsync(null);
     }
 
-    private async Task<IEnumerable<IDocLandmark>> GetCampsitesInternalAsync(RegionEnum? regionCode)
+    private async Task<IEnumerable<ILandmark>> GetCampsitesInternalAsync(RegionEnum? regionCode)
     {
         var cacheKey = regionCode.HasValue ? $"{CacheKeyPrefix}_{regionCode.Value}" : $"{CacheKeyPrefix}_All";
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<IDocLandmark>? cachedCampsites) && cachedCampsites != null)
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<ILandmark>? cachedCampsites) && cachedCampsites != null)
         {
             return cachedCampsites;
         }
@@ -40,17 +42,20 @@ public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILan
             {
                 try
                 {
-                    return factory.CreateDocLandmark(
-                        docId: campsiteDto.AssetId.ToString(),
-                        name: campsiteDto.Name,
-                        latitude: campsiteDto.Lat,
-                        longitude: campsiteDto.Lon,
-                        landmarkType: DocLandmarkType.Campsite
-                    );
+                    var parameters = new LandmarkCreationParameters
+                    {
+                        DocId = campsiteDto.AssetId.ToString(),
+                        Name = campsiteDto.Name,
+                        Latitude = campsiteDto.Lat,
+                        Longitude = campsiteDto.Lon,
+                        LandmarkType = LandmarkType.Campsite
+                    };
+                    return factory.CreateLandmark(parameters);
                 }
                 catch (ArgumentException ex)
                 {
-                    Log.Error(ex, "Argument Validation error for campsite with AssetId {AssetId}: {Message}", campsiteDto.AssetId,
+                    Log.Error(ex, "Argument Validation error for campsite with AssetId {AssetId}: {Message}",
+                        campsiteDto.AssetId,
                         ex.Message);
                     return null;
                 }

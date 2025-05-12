@@ -1,19 +1,12 @@
-
-using AdventureArchive.Api.Domain.Entities;
+using AdventureArchive.Api.Domain.Entities.Landmark;
 
 namespace AdventureArchive.Api.Api.Models.Doc.Huts;
 
-public class GetHutsResponse
+public class GetHutsResponse(IEnumerable<HutLandmark> huts)
 {
-    public List<HutContract> Huts { get; set; }
+    public IEnumerable<HutLandmark> Huts { get; init; } = huts;
 
-    public GetHutsResponse()
+    public GetHutsResponse() : this([])
     {
-        Huts = [];
-    }
-    
-    public GetHutsResponse(IEnumerable<Hut> huts)
-    {
-        Huts = huts.Select(hut => hut.ToContract()).ToList();
     }
 }

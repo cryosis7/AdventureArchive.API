@@ -26,8 +26,7 @@ public static class ServiceExtensions
             });
         services.AddScoped<IDocService, DocService>();
         services.AddScoped<ILandmarkFactory, LandmarkFactory>();
-        services.AddScoped<ILandmarkRepository, HutRepository>();
         services.AddScoped<ICampsiteRepository, CampsiteRepository>();
-        services.AddScoped<IDocLandmarkRepository, HutRepository>();
+        services.AddScoped<IHutRepository, HutRepository>();
     }
 }

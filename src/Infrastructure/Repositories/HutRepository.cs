@@ -1,5 +1,6 @@
 using AdventureArchive.Api.Domain.Entities.Landmark;
 using AdventureArchive.Api.Domain.Enums;
+using AdventureArchive.Api.Domain.Factories;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 using Serilog;
@@ -7,14 +8,14 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace AdventureArchive.Api.Infrastructure.Repositories;
 
-public class HutRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory) : IDocLandmarkRepository
+public class HutRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory) : IHutRepository
 {
     private readonly IDocService _docService = docService ?? throw new ArgumentNullException(nameof(docService));
     private readonly IMemoryCache _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(7);
     private const string CacheKeyPrefix = "Huts";
 
-    public async Task<IEnumerable<IDocLandmark>> GetByRegion(RegionEnum regionCode)
+    public async Task<IEnumerable<ILandmark>> GetByRegion(RegionEnum regionCode)
     {
         return await GetHutsInternalAsync(regionCode);
     }
@@ -24,10 +25,10 @@ public class HutRepository(IDocService docService, IMemoryCache cache, ILandmark
         return await GetHutsInternalAsync(null);
     }
 
-    private async Task<IEnumerable<IDocLandmark>> GetHutsInternalAsync(RegionEnum? regionCode)
+    private async Task<IEnumerable<ILandmark>> GetHutsInternalAsync(RegionEnum? regionCode)
     {
         var cacheKey = regionCode.HasValue ? $"{CacheKeyPrefix}_{regionCode.Value}" : $"{CacheKeyPrefix}_All";
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<IDocLandmark>? cachedHuts) && cachedHuts != null)
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<ILandmark>? cachedHuts) && cachedHuts != null)
         {
             return cachedHuts;
         }
@@ -39,13 +40,15 @@ public class HutRepository(IDocService docService, IMemoryCache cache, ILandmark
             {
                 try
                 {
-                    return factory.CreateDocLandmark(
-                        docId: hutDto.AssetId.ToString(),
-                        name: hutDto.Name,
-                        latitude: hutDto.Lat,
-                        longitude: hutDto.Lon,
-                        landmarkType: DocLandmarkType.Hut
-                    );
+                    var parameters = new LandmarkCreationParameters
+                    {
+                        DocId = hutDto.AssetId.ToString(),
+                        Name = hutDto.Name,
+                        Latitude = hutDto.Lat,
+                        Longitude = hutDto.Lon,
+                        LandmarkType = LandmarkType.Hut
+                    };
+                    return factory.CreateLandmark(parameters);
                 }
                 catch (ArgumentException ex)
                 {

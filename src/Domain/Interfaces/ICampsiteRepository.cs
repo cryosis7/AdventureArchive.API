@@ -3,7 +3,7 @@ using AdventureArchive.Api.Domain.Enums;
 
 namespace AdventureArchive.Api.Domain.Interfaces;
 
-public interface ICampsiteRepository : IDocLandmarkRepository
+public interface ICampsiteRepository : ILandmarkRepository
 {
-    // Additional methods specific to Campsites can be added here
+    Task<IEnumerable<ILandmark>> GetByRegion(RegionEnum region);
 }

@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using AdventureArchive.Api.Api.Models.Doc.Tracks;
-
 namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
 
 public class TrackDto

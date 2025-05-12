@@ -1,6 +1,6 @@
 namespace AdventureArchive.Api.Domain.Enums;
 
-public enum DocLandmarkType
+public enum LandmarkType
 {
     Hut,
     Campsite

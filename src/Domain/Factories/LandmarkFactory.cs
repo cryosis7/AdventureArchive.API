@@ -7,19 +7,18 @@ namespace AdventureArchive.Api.Domain.Factories;
 
 public class LandmarkFactory : ILandmarkFactory
 {
-    public IDocLandmark CreateDocLandmark(string docId, string name, Location location, DocLandmarkType landmarkType, string? description = null)
+    public ILandmark CreateLandmark(LandmarkCreationParameters parameters)
     {
-        return landmarkType switch
+        return parameters.LandmarkType switch
         {
-            DocLandmarkType.Hut => new HutLandmark(docId, name, location, description),
-            DocLandmarkType.Campsite => new CampsiteLandmark(docId, name, location, description),
-            _ => throw new ArgumentOutOfRangeException(nameof(landmarkType), landmarkType, "Unsupported landmark type")
+            LandmarkType.Hut => new HutLandmark(parameters.DocId ?? "", parameters.Name,
+                new Location(parameters.Latitude, parameters.Longitude),
+                parameters.Description),
+            LandmarkType.Campsite => new CampsiteLandmark(parameters.DocId ?? "", parameters.Name,
+                new Location(parameters.Latitude, parameters.Longitude),
+                parameters.Description),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(parameters.LandmarkType), parameters.LandmarkType, null)
         };
-    }
-
-    public IDocLandmark CreateDocLandmark(string docId, string name, double latitude, double longitude, DocLandmarkType landmarkType, string? description = null)
-    {
-        var location = new Location(latitude, longitude);
-        return CreateDocLandmark(docId, name, location, landmarkType, description);
     }
 }
