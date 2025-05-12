@@ -33,7 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\Application\Interfaces\" />
-    <Folder Include="src\Domain\DomainServices\" />
   </ItemGroup>
   
   <Target Name="GenerateOpenApiSpec" AfterTargets="Build">

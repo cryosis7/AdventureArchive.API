@@ -9,7 +9,7 @@ namespace AdventureArchive.Api.Api.Controllers;
 
 [ApiController]
 [Route("api/doc")]
-public class DocController(IHutProvider hutProvider, ITrackProvider trackProvider) : ControllerBase
+public class DocController(IDocLandmarkRepository docLandmarkRepository) : ControllerBase
 {
     /// <summary>
     /// Gets tracks for a region from the DOC api
@@ -41,29 +41,23 @@ public class DocController(IHutProvider hutProvider, ITrackProvider trackProvide
     /// - NZ-STL: Southland + Fiordland
     /// - DOC-FIL: Fiordland
     /// </remarks>
-    [HttpGet("tracks")]
-    [ProducesResponseType(typeof(GetTracksResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<GetTracksResponse>> GetTracks([FromQuery] string? regionCode)
-    {
-        if (regionCode != null && regionCode.ToRegionEnum() == null)
-        {
-            Log.Information("Invalid region code {RegionCode} provided", regionCode);
-            return BadRequest("Invalid region code.");
-        }
+    // [HttpGet("tracks")]
+    // [ProducesResponseType(typeof(GetTracksResponse), StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // public async Task<ActionResult<GetTracksResponse>> GetTracks([FromQuery] string? regionCode)
+    // {
+    //     if (regionCode != null && regionCode.ToRegionEnum() == null)
+    //     {
+    //         Log.Information("Invalid region code {RegionCode} provided", regionCode);
+    //         return BadRequest("Invalid region code.");
+    //     }
+    //
+    //     var tracksData = await trackProvider.GetAllAsync(regionCode.ToRegionEnum());
+    //     return Ok(new GetTracksResponse(tracksData));
+    // }
 
-        var tracksData = await trackProvider.GetAllAsync(regionCode.ToRegionEnum());
-        return Ok(new GetTracksResponse(tracksData));
-    }
 
-    /// <summary>
-    /// Gets all huts from the DOC API
-    /// </summary>
-    /// <returns>
-    /// 200 OK with hut data if successful.
-    /// 500 Internal Server Error
-    /// </returns>
     [HttpGet("huts")]
     [ProducesResponseType(typeof(GetHutsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,7 +70,7 @@ public class DocController(IHutProvider hutProvider, ITrackProvider trackProvide
             return BadRequest("Invalid region code.");
         }
         
-        var hutsData = await hutProvider.GetAllAsync(regionCode.ToRegionEnum());
+        var hutsData = await docLandmarkRepository.GetAllAsync(regionCode.ToRegionEnum());
         return Ok(new GetHutsResponse(hutsData));
     }
 }

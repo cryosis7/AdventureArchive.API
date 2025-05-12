@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using System.Web;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Hut;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
+using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Campsite;
 using Microsoft.Extensions.Options;
 
 namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
@@ -12,8 +13,9 @@ public interface IDocHttpClient
     Task<List<TrackDto>> GetAllTracksAsync();
     Task<List<TrackDto>> GetTracksByRegionAsync(string regionCode);
     Task<List<HutDto>> GetHutsAsync();
-    
     Task<List<HutDto>> GetHutsByRegionAsync(string regionCode);
+    Task<List<CampsiteDto>> GetCampsitesAsync();
+    Task<List<CampsiteDto>> GetCampsitesByRegionAsync(string regionCode);
 }
 
 public class DocHttpClient : IDocHttpClient
@@ -84,6 +86,35 @@ public class DocHttpClient : IDocHttpClient
     public async Task<List<HutDto>> GetHutsByRegionAsync(string regionCode)
     {
         var requestUrl = BuildRequestUrl(_docApiOptions.Endpoints.Huts, new Dictionary<string, string>
+        {
+            { "region", regionCode }
+        });
+
+        var response = await _httpClient.GetAsync(requestUrl);
+        response.EnsureSuccessStatusCode();
+
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var huts = JsonSerializer.Deserialize<List<HutDto>>(jsonString, _jsonSerialisationOptions);
+
+        return huts ?? [];
+    }
+
+    public async Task<List<CampsiteDto>> GetCampsitesAsync()
+    {
+        var requestUrl = BuildRequestUrl(_docApiOptions.Endpoints.Campsites);
+        
+        var response = await _httpClient.GetAsync(requestUrl);
+        response.EnsureSuccessStatusCode();
+
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var campsites = JsonSerializer.Deserialize<List<HutDto>>(jsonString, _jsonSerialisationOptions);
+
+        return campsites ?? [];
+    }
+
+    public async Task<List<CampsiteDto>> GetCampsitesByRegionAsync(string regionCode)
+    {
+               var requestUrl = BuildRequestUrl(_docApiOptions.Endpoints.Huts, new Dictionary<string, string>
         {
             { "region", regionCode }
         });

@@ -1,5 +1,6 @@
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Hut;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
+using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Campsite;
 
 namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 
@@ -25,5 +26,14 @@ public class DocService(IDocHttpClient docHttpClient) : IDocService
         }
 
         return await _docHttpClient.GetHutsByRegionAsync(regionCode);
+    }
+
+    public async Task<IEnumerable<CampsiteDto>> GetCampsitesAsync(string? regionCode)
+    {
+        if (string.IsNullOrEmpty(regionCode))
+        {
+            return await _docHttpClient.GetCampsitesAsync();
+        }
+        return await _docHttpClient.GetCampsitesByRegionAsync(regionCode);
     }
 }

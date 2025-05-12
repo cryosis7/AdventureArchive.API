@@ -1,56 +1,55 @@
-using System.ComponentModel.DataAnnotations;
-using AdventureArchive.Api.Domain.Entities;
+using AdventureArchive.Api.Domain.Entities.Landmark;
 using AdventureArchive.Api.Domain.Enums;
-using AdventureArchive.Api.Domain.Extensions;
 using AdventureArchive.Api.Domain.Interfaces;
-using AdventureArchive.Api.Domain.ValueObjects;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 using Serilog;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AdventureArchive.Api.Infrastructure.Repositories;
 
-public class HutRepository : IHutProvider
+public class HutRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory) : IDocLandmarkRepository
 {
-    private readonly IDocService _docService;
-    private readonly IMemoryCache _cache;
+    private readonly IDocService _docService = docService ?? throw new ArgumentNullException(nameof(docService));
+    private readonly IMemoryCache _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(7);
+    private const string CacheKeyPrefix = "Huts";
 
-    public HutRepository(IDocService docService, IMemoryCache cache)
+    public async Task<IEnumerable<IDocLandmark>> GetByRegion(RegionEnum regionCode)
     {
-        _docService = docService ?? throw new ArgumentNullException(nameof(docService));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        return await GetHutsInternalAsync(regionCode);
     }
 
-    public async Task<IEnumerable<Hut>> GetAllAsync(RegionEnum? regionCode)
+    public async Task<IEnumerable<ILandmark>> GetAllAsync()
     {
-        var cacheKey = $"Huts_{regionCode}";
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<Hut>? cachedHuts) && cachedHuts != null)
+        return await GetHutsInternalAsync(null);
+    }
+
+    private async Task<IEnumerable<IDocLandmark>> GetHutsInternalAsync(RegionEnum? regionCode)
+    {
+        var cacheKey = regionCode.HasValue ? $"{CacheKeyPrefix}_{regionCode.Value}" : $"{CacheKeyPrefix}_All";
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<IDocLandmark>? cachedHuts) && cachedHuts != null)
         {
             return cachedHuts;
         }
 
         Log.Information("Cache miss for huts CacheKey: {CacheKey} - Fetching from DocApi", cacheKey);
-        var hutsResponse = await _docService.GetHutsAsync(regionCode.ToString());
+        var hutsResponse = await _docService.GetHutsAsync(regionCode?.ToString());
         var huts = hutsResponse
             .Select(hutDto =>
             {
                 try
                 {
-                    var hut = new Hut
-                    {
-                        AssetId = hutDto.AssetId,
-                        Name = hutDto.Name,
-                        Status = Enum.Parse<StatusEnum>(hutDto.Status),
-                        Region = hutDto.Region.ToRegionEnum(),
-                        Location = Location.CreateLocation(hutDto.Lat, hutDto.Lon)
-                    };
-                    hut.Validate();
-                    return hut;
+                    return factory.CreateDocLandmark(
+                        docId: hutDto.AssetId.ToString(),
+                        name: hutDto.Name,
+                        latitude: hutDto.Lat,
+                        longitude: hutDto.Lon,
+                        landmarkType: DocLandmarkType.Hut
+                    );
                 }
-                catch (ValidationException ex)
+                catch (ArgumentException ex)
                 {
-                    Log.Error(ex, "Validation error for hut with AssetId {AssetId}: {Message}", hutDto.AssetId,
+                    Log.Error(ex, "Argument Validation error for hut with AssetId {AssetId}: {Message}", hutDto.AssetId,
                         ex.Message);
                     return null;
                 }
@@ -61,5 +60,10 @@ public class HutRepository : IHutProvider
 
         _cache.Set(cacheKey, huts, CacheDuration);
         return huts;
+    }
+
+    public ILandmark GetById(Guid id)
+    {
+        throw new NotImplementedException();
     }
 }

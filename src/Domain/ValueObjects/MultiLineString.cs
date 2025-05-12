@@ -4,7 +4,6 @@ namespace AdventureArchive.Api.Domain.ValueObjects;
 
 public class MultiLineString : ValueObject
 {
-    [Required]
     public List<List<Location>> Lines { get; }
 
     public MultiLineString(List<List<List<double>>> coordinates)
@@ -31,7 +30,7 @@ public class MultiLineString : ValueObject
 
         Lines = coordinates
             .Select(line => line
-                .Select(point => Location.CreateLocation(point[1], point[0]))
+                .Select(point => new Location(point[1], point[0]))
                 .ToList())
             .ToList();
     }

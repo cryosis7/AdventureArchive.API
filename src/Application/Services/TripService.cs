@@ -1,5 +1,5 @@
 using AdventureArchive.Api.Domain.Entities.Trip;
-using AdventureArchive.Api.Domain.Entities.Waypoint;
+using AdventureArchive.Api.Domain.Entities.Visit;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Domain.ValueObjects;
 
@@ -19,7 +19,7 @@ public class TripService(ITripProvider tripRepository) : ITripService
             {
                 Name = name,
                 TripDateRange = new DateRange(startDate, duration.Value),
-                Waypoints = new List<IWaypoint>()
+                Waypoints = new List<IVisit>()
             };
         }
         else
@@ -28,7 +28,7 @@ public class TripService(ITripProvider tripRepository) : ITripService
             {
                 Name = name,
                 TripDateRange = new DateRange(startDate, endDate ?? startDate),
-                Waypoints = new List<IWaypoint>()
+                Waypoints = new List<IVisit>()
             };
         }
         await _tripRepository.AddAsync(newTrip);

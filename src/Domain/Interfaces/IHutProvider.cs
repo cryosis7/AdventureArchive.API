@@ -1,9 +1,0 @@
-using AdventureArchive.Api.Domain.Entities;
-using AdventureArchive.Api.Domain.Enums;
-
-namespace AdventureArchive.Api.Domain.Interfaces;
-
-public interface IHutProvider
-{
-    public Task<IEnumerable<Hut>> GetAllAsync(RegionEnum? regionCode);
-}

@@ -1,3 +1,4 @@
+using AdventureArchive.Api.Domain.Factories;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 using AdventureArchive.Api.Infrastructure.Repositories;
@@ -24,8 +25,9 @@ public static class ServiceExtensions
                 return new HttpClientHandler();
             });
         services.AddScoped<IDocService, DocService>();
-        services.AddScoped<IHutProvider, HutRepository>();
-        services.AddScoped<ITrackProvider, TrackRepository>();
-        
+        services.AddScoped<ILandmarkFactory, LandmarkFactory>();
+        services.AddScoped<ILandmarkRepository, HutRepository>();
+        services.AddScoped<ICampsiteRepository, CampsiteRepository>();
+        services.AddScoped<IDocLandmarkRepository, HutRepository>();
     }
 }
