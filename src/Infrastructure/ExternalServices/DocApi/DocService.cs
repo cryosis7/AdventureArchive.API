@@ -1,6 +1,6 @@
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Hut;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
-using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Campsite;
+using AdventureArchive.Infrastructure.ExternalServices.DocApi.Models.Campsite;
 
 namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 

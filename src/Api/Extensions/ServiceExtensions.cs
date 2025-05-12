@@ -1,7 +1,7 @@
 using AdventureArchive.Api.Domain.Factories;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
-using AdventureArchive.Api.Infrastructure.Repositories;
+using AdventureArchive.Infrastructure.Repositories;
 
 namespace AdventureArchive.Api.Api.Extensions;
 

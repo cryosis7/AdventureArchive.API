@@ -1,4 +1,4 @@
-namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Campsite;
+namespace AdventureArchive.Infrastructure.ExternalServices.DocApi.Models.Campsite;
 
 public class CampsiteDto
 {

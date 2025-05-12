@@ -3,10 +3,13 @@ using AdventureArchive.Api.Api.Extensions;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
 using Serilog;
 using Serilog.Events;
+using Serilog.Exceptions;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.Seq("http://localhost:5341")
+    .Enrich.WithExceptionDetails()
+    .Enrich.WithCorrelationId(addValueIfHeaderAbsence: true)
     .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)

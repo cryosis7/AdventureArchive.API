@@ -3,15 +3,18 @@ using AdventureArchive.Api.Domain.Enums;
 using AdventureArchive.Api.Domain.Factories;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
-using Serilog;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
-namespace AdventureArchive.Api.Infrastructure.Repositories;
+namespace AdventureArchive.Infrastructure.Repositories;
 
-public class HutRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory) : IHutRepository
+public class HutRepository(
+    IDocService docService,
+    IMemoryCache cache,
+    ILandmarkFactory factory,
+    ILogger<HutRepository> logger)
+    : IHutRepository
 {
-    private readonly IDocService _docService = docService ?? throw new ArgumentNullException(nameof(docService));
-    private readonly IMemoryCache _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(7);
     private const string CacheKeyPrefix = "Huts";
 
@@ -28,13 +31,13 @@ public class HutRepository(IDocService docService, IMemoryCache cache, ILandmark
     private async Task<IEnumerable<ILandmark>> GetHutsInternalAsync(RegionEnum? regionCode)
     {
         var cacheKey = regionCode.HasValue ? $"{CacheKeyPrefix}_{regionCode.Value}" : $"{CacheKeyPrefix}_All";
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<ILandmark>? cachedHuts) && cachedHuts != null)
+        if (cache.TryGetValue(cacheKey, out IEnumerable<ILandmark>? cachedHuts) && cachedHuts != null)
         {
             return cachedHuts;
         }
 
-        Log.Information("Cache miss for huts CacheKey: {CacheKey} - Fetching from DocApi", cacheKey);
-        var hutsResponse = await _docService.GetHutsAsync(regionCode?.ToString());
+        logger.LogInformation("Cache miss for huts CacheKey: {CacheKey} - Fetching from DocApi", cacheKey);
+        var hutsResponse = await docService.GetHutsAsync(regionCode?.ToString());
         var huts = hutsResponse
             .Select(hutDto =>
             {
@@ -52,7 +55,7 @@ public class HutRepository(IDocService docService, IMemoryCache cache, ILandmark
                 }
                 catch (ArgumentException ex)
                 {
-                    Log.Error(ex, "Argument Validation error for hut with AssetId {AssetId}: {Message}", hutDto.AssetId,
+                    logger.LogError(ex, "Argument Validation error for hut with AssetId {AssetId}: {Message}", hutDto.AssetId,
                         ex.Message);
                     return null;
                 }
@@ -61,7 +64,7 @@ public class HutRepository(IDocService docService, IMemoryCache cache, ILandmark
             .Select(hut => hut!)
             .ToList();
 
-        _cache.Set(cacheKey, huts, CacheDuration);
+        cache.Set(cacheKey, huts, CacheDuration);
         return huts;
     }
 

@@ -3,16 +3,18 @@ using AdventureArchive.Api.Domain.Enums;
 using AdventureArchive.Api.Domain.Factories;
 using AdventureArchive.Api.Domain.Interfaces;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
-using Serilog;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
-namespace AdventureArchive.Api.Infrastructure.Repositories;
+namespace AdventureArchive.Infrastructure.Repositories;
 
-public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILandmarkFactory factory)
+public class CampsiteRepository(
+    IDocService docService,
+    IMemoryCache cache,
+    ILandmarkFactory factory,
+    ILogger<CampsiteRepository> logger)
     : ICampsiteRepository
 {
-    private readonly IDocService _docService = docService ?? throw new ArgumentNullException(nameof(docService));
-    private readonly IMemoryCache _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(7);
     private const string CacheKeyPrefix = "Campsites";
 
@@ -29,14 +31,13 @@ public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILan
     private async Task<IEnumerable<ILandmark>> GetCampsitesInternalAsync(RegionEnum? regionCode)
     {
         var cacheKey = regionCode.HasValue ? $"{CacheKeyPrefix}_{regionCode.Value}" : $"{CacheKeyPrefix}_All";
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<ILandmark>? cachedCampsites) && cachedCampsites != null)
+        if (cache.TryGetValue(cacheKey, out IEnumerable<ILandmark>? cachedCampsites) && cachedCampsites != null)
         {
             return cachedCampsites;
         }
 
-        Log.Information("Cache miss for campsites CacheKey: {CacheKey} - Fetching from DocApi", cacheKey);
-        // TODO: Implement GetCampsitesAsync in IDocService and DocService
-        var campsitesResponse = await _docService.GetCampsitesAsync(regionCode?.ToString());
+        logger.LogInformation("Cache miss for campsites CacheKey: {CacheKey} - Fetching from DocApi", cacheKey);
+        var campsitesResponse = await docService.GetCampsitesAsync(regionCode?.ToString());
         var campsites = campsitesResponse
             .Select(campsiteDto =>
             {
@@ -54,9 +55,7 @@ public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILan
                 }
                 catch (ArgumentException ex)
                 {
-                    Log.Error(ex, "Argument Validation error for campsite with AssetId {AssetId}: {Message}",
-                        campsiteDto.AssetId,
-                        ex.Message);
+                    logger.LogError(ex, "Argument Validation error for campsite with AssetId {AssetId}: {Message}", campsiteDto.AssetId, ex.Message);
                     return null;
                 }
             })
@@ -64,7 +63,7 @@ public class CampsiteRepository(IDocService docService, IMemoryCache cache, ILan
             .Select(campsite => campsite!)
             .ToList();
 
-        _cache.Set(cacheKey, campsites, CacheDuration);
+        cache.Set(cacheKey, campsites, CacheDuration);
         return campsites;
     }
 

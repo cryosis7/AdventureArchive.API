@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using System.Web;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Hut;
 using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Track;
-using AdventureArchive.Api.Infrastructure.ExternalServices.DocApi.Models.Campsite;
+using AdventureArchive.Infrastructure.ExternalServices.DocApi.Models.Campsite;
 using Microsoft.Extensions.Options;
 
 namespace AdventureArchive.Api.Infrastructure.ExternalServices.DocApi;
